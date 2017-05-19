@@ -27,9 +27,10 @@
 /**
  隐藏状态
 
- @param hidden <#hidden description#>
+ @param hidden YES||NO
  */
 + (void)hiddenStatus:(BOOL)hidden;
+
 #pragma mark -
 #pragma mark - 关于时间
 
