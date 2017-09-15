@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
+#import "Enumeration.h"
 typedef void(^PHGroupViewControllerBlock)(id result);
 
 @interface PHCollectionViewController : UIViewController
