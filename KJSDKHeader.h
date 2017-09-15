@@ -42,5 +42,6 @@
 #import "KJProgressManager.h"
 #import "KJBlankViewManager.h"
 
+#import "PHHeader.h"
 
 #endif /* KJSDKHeader_h */

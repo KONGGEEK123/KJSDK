@@ -11,7 +11,7 @@
 static char limit;
 @implementation UITextField (LimitCount)
 - (void)setLimitCount:(NSInteger)limitCount {
-    objc_setAssociatedObject(self, &limit, [NSString stringWithFormat:@"%ld", (long)limitCount], OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(self, &limit, [NSString stringWithFormat:@"%ld", (long)limitCount], OBJC_ASSOCIATION_COPY);
     [self setTextLimit];
 }
 
