@@ -12,7 +12,7 @@
 #import "PHTabbarView.h"
 #import "PHScanningViewController.h"
 #import "CameraCollectionViewCell.h"
-
+#import "Enumeration.h"
 @interface PHCollectionViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UIGestureRecognizerDelegate,PHTabbarViewDelegate,RSKImageCropViewControllerDelegate>
 
 @property (strong, nonatomic) NSMutableArray <KJAsset *>*array;

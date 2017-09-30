@@ -10,6 +10,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "PHData.h"
 #import "PHHeader.h"
+#import "UIColor+Hex.h"
 @interface PHCollectionViewCell ()
 @property (strong, nonatomic) UIImageView  *imageView;
 @property (strong, nonatomic) UIImageView  *selectedImageView;
