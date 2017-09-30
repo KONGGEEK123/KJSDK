@@ -19,7 +19,14 @@
  @param cancel 取消
  */
 + (void)showCameraInViewController:(UIViewController *)viewController cameraType:(CameraType)cameraType sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss;
-
+/**
+ 调取照相机 单张 方形切割
+ 
+ @param viewController 试图控制器
+ @param sure 确定
+ @param cancel 取消
+ */
++ (void)showCameraWithCropInViewController:(UIViewController *)viewController sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss;
 /**
  调取照相机
  

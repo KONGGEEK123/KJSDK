@@ -9,14 +9,14 @@
 #import "PHTool.h"
 #import "PHGroupViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
-
+#import "RSKImageCropViewController.h"
 typedef void(^PHToolCameraSureBlock)(id result);
 typedef void(^PHToolCancelBlock)(void);
 typedef void(^PHToolDismissBlock)(void);
 
 static PHTool *manager;
 
-@interface PHTool()<UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface PHTool()<UIImagePickerControllerDelegate,UINavigationControllerDelegate,RSKImageCropViewControllerDelegate>
 /**
  照相机 单选
  */
@@ -25,6 +25,8 @@ static PHTool *manager;
 @property (copy, nonatomic)  PHToolCameraSureBlock cameraSureBlock;
 @property (copy, nonatomic)  PHToolCancelBlock cancelBlock;
 @property (copy, nonatomic)  PHToolDismissBlock dismissBlock;
+@property (strong, nonatomic) UIViewController *currentViewController;
+@property (assign, nonatomic) BOOL cameraCanCrop;
 @end
 
 @implementation PHTool
@@ -45,6 +47,7 @@ static PHTool *manager;
  */
 + (void)showCameraInViewController:(UIViewController *)viewController cameraType:(CameraType)cameraType sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss {
     // 判断是否有相机
+    [PHTool shareManager].cameraCanCrop = NO;
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
         
         UIImagePickerController *picker = [[UIImagePickerController alloc]init];
@@ -57,6 +60,38 @@ static PHTool *manager;
         }else {
             picker.mediaTypes = @[(NSString *)kUTTypeMovie,(NSString *)kUTTypeImage];
         }
+        picker.cameraDevice = UIImagePickerControllerCameraDeviceRear;//设置相机后摄像头
+        picker.videoMaximumDuration = 10;//最长拍摄时间
+        picker.videoQuality = UIImagePickerControllerQualityTypeHigh;//拍摄质量
+        
+        picker.allowsEditing = NO;//是否可编辑
+        picker.delegate = [PHTool shareManager];
+        [viewController presentViewController:picker animated:YES completion:nil];
+        [PHTool shareManager].pickerViewController = picker;
+    }else {
+        NSLog(@"该设备无摄像头");
+    }
+    [PHTool shareManager].cameraSureBlock = sure;
+    [PHTool shareManager].cancelBlock = cancel;
+    [PHTool shareManager].dismissBlock = dismiss;
+}
+
+/**
+ 调取照相机 单张 方形切割
+ 
+ @param viewController 试图控制器
+ @param sure 确定
+ @param cancel 取消
+ */
++ (void)showCameraWithCropInViewController:(UIViewController *)viewController sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss {
+    // 判断是否有相机
+    [PHTool shareManager].cameraCanCrop = YES;
+    [PHTool shareManager].currentViewController = viewController;
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
+        
+        UIImagePickerController *picker = [[UIImagePickerController alloc]init];
+        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        picker.mediaTypes = @[(NSString *)kUTTypeImage];
         picker.cameraDevice = UIImagePickerControllerCameraDeviceRear;//设置相机后摄像头
         picker.videoMaximumDuration = 10;//最长拍摄时间
         picker.videoQuality = UIImagePickerControllerQualityTypeHigh;//拍摄质量
@@ -118,15 +153,22 @@ static PHTool *manager;
         }else{
             image=[info objectForKey:UIImagePickerControllerOriginalImage];//获取原始照片
         }
-        if ([PHTool shareManager].cameraSureBlock) {
-            [PHTool shareManager].cameraSureBlock (image);
-            [[PHTool shareManager].pickerViewController dismissViewControllerAnimated:YES completion:^{
-                if ([PHTool shareManager].dismissBlock) {
-                    [PHTool shareManager].dismissBlock();
-                }
-            }];
+        if ([PHTool shareManager].cameraCanCrop) {
+            RSKImageCropViewController *imageCropVC = [[RSKImageCropViewController alloc] initWithImage:image cropMode:RSKImageCropModeSquare];
+            imageCropVC.delegate = [PHTool shareManager];
+            imageCropVC.ratio = 5.0f;
+            [[PHTool shareManager].pickerViewController presentViewController:imageCropVC animated:YES completion:nil];
+        }else {
+            if ([PHTool shareManager].cameraSureBlock) {
+                [PHTool shareManager].cameraSureBlock (image);
+                [[PHTool shareManager].pickerViewController dismissViewControllerAnimated:YES completion:^{
+                    if ([PHTool shareManager].dismissBlock) {
+                        [PHTool shareManager].dismissBlock();
+                    }
+                }];
+            }
+            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);//保存到相簿
         }
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);//保存到相簿
     }else if([mediaType isEqualToString:(NSString *)kUTTypeMovie]){//如果是录制视频
         NSLog(@"video...");
         NSURL *url=[info objectForKey:UIImagePickerControllerMediaURL];//视频路径
@@ -145,6 +187,24 @@ static PHTool *manager;
         }
         
     }
+}
+#pragma mark - Delegate Method: RSKImageCropViewControllerDelegate
+
+- (void)imageCropViewController:(RSKImageCropViewController *)controller didCropImage:(UIImage *)croppedImage usingCropRect:(CGRect)cropRect {
+    [controller dismissViewControllerAnimated:YES completion:nil];
+    if ([PHTool shareManager].cameraSureBlock) {
+        [PHTool shareManager].cameraSureBlock (croppedImage);
+        [[PHTool shareManager].pickerViewController dismissViewControllerAnimated:YES completion:^{
+            if ([PHTool shareManager].dismissBlock) {
+                [PHTool shareManager].dismissBlock();
+            }
+        }];
+    }
+    UIImageWriteToSavedPhotosAlbum(croppedImage, nil, nil, nil);//保存到相簿
+}
+- (void)imageCropViewControllerDidCancelCrop:(RSKImageCropViewController *)controller {
+    [controller dismissViewControllerAnimated:YES completion:nil];
+    NSLog(@"用户放弃裁剪图片");
 }
 
 //视频保存后的回调
