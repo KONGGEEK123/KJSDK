@@ -38,12 +38,18 @@
         }];
         [alertVC addAction:actionSure];
     }
-    UIAlertAction * actionCancel = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        if (cancelBlock) {
-            cancelBlock();
-        }
-    }];
-    [alertVC addAction:actionCancel];
+    if (cancelButtonTitle.length) {
+        UIAlertAction * actionCancel = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            if (cancelBlock) {
+                cancelBlock();
+            }
+        }];
+        [alertVC addAction:actionCancel];
+    }
+    NSString *deviceType = [UIDevice currentDevice].model;
+    if([deviceType isEqualToString:@"iPad"]) {
+        alertVC.popoverPresentationController.sourceView = [(UIViewController *)viewController view];
+    }
     [viewController presentViewController:alertVC animated:YES completion:nil];
     return alertVC;
 }
@@ -76,12 +82,18 @@
         }];
         [alertVC addAction:actionSure];
     }];
-    UIAlertAction * actionCancel = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        if (cancelBlock) {
-            cancelBlock();
-        }
-    }];
-    [alertVC addAction:actionCancel];
+    if (cancelButtonTitle) {
+        UIAlertAction * actionCancel = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            if (cancelBlock) {
+                cancelBlock();
+            }
+        }];
+        [alertVC addAction:actionCancel];
+    }
+    NSString *deviceType = [UIDevice currentDevice].model;
+    if([deviceType isEqualToString:@"iPad"]) {
+        alertVC.popoverPresentationController.sourceView = [(UIViewController *)viewController view];
+    }
     [viewController presentViewController:alertVC animated:YES completion:nil];
     return alertVC;
 }

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Enumeration.h"
-
+#import <UIKit/UIKit.h>
 @interface PHTool : NSObject
 
 /**
@@ -18,7 +18,7 @@
  @param sure 确定
  @param cancel 取消
  */
-+ (void)showCameraInViewController:(UIViewController *)viewController cameraType:(CameraType)cameraType sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss;
++ (void)showCameraInViewController:(UIViewController *)viewController cameraType:(CameraType)cameraType sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)(void))dismiss;
 /**
  调取照相机 单张 方形切割
  
@@ -26,7 +26,7 @@
  @param sure 确定
  @param cancel 取消
  */
-+ (void)showCameraWithCropInViewController:(UIViewController *)viewController sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss;
++ (void)showCameraWithCropInViewController:(UIViewController *)viewController sure:(void(^)(id result))sure cancel:(void(^)(void))cancel dismiss:(void(^)(void))dismiss;
 /**
  调取照相机
  
@@ -34,7 +34,7 @@
  @param sure 确定
  @param cancel 取消
  */
-+ (void)showPhotoCameraInViewController:(UIViewController *)viewController sure:(void(^)(UIImage *image))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss;
++ (void)showPhotoCameraInViewController:(UIViewController *)viewController sure:(void(^)(UIImage *image))sure cancel:(void(^)(void))cancel dismiss:(void(^)(void))dismiss;
 
 /**
  调取摄像机拍摄视频
@@ -43,7 +43,7 @@
  @param sure 确定
  @param cancel 取消
  */
-+ (void)showVideoCameraInViewController:(UIViewController *)viewController sure:(void(^)(NSURL *videoUrl))sure cancel:(void(^)(void))cancel dismiss:(void(^)())dismiss;
++ (void)showVideoCameraInViewController:(UIViewController *)viewController sure:(void(^)(NSURL *videoUrl))sure cancel:(void(^)(void))cancel dismiss:(void(^)(void))dismiss;
 
 /**
  弹出相册 （默认到第一个分组）
