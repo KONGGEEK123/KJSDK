@@ -7,6 +7,7 @@
 //
 
 #import "KJCommonMethods.h"
+#import<CommonCrypto/CommonDigest.h>
 
 @implementation KJCommonMethods
 
@@ -524,5 +525,35 @@
 + (void)call:(NSString *)phone {
     NSMutableString *str = [[NSMutableString alloc] initWithFormat:@"telprompt://%@",phone];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+}
++ (BOOL)runningInBackground {
+    UIApplicationState state = [UIApplication sharedApplication].applicationState;
+    BOOL result = (state == UIApplicationStateBackground);
+    return result;
+}
++ (NSString *)md5:(NSString *)string {
+    const char *cStr = [string UTF8String];
+    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5( cStr, strlen(cStr), digest ); // This is the md5 call
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
+    [output appendFormat:@"%02x", digest[i]];
+    return  output;
+}
++ (NSString *)sizeOfBit:(NSInteger)size {
+    if (size < 0) {
+        return nil;
+    }
+    if (size == 0) {
+        return @"0 B";
+    }else if (size <= 1024) {
+        return @"1 KB";
+    }else if (size < 1024 * 1024) {
+        return [NSString stringWithFormat:@"%.1f KB",size / 1024.0];
+    }else if (size < 1024 * 1024 * 1024) {
+        return [NSString stringWithFormat:@"%.1f MB",size / (1024.0 * 1024.0)];
+    }else {
+        return [NSString stringWithFormat:@"%.1f GB",size / (1024.0 * 1024.0 * 1024.0)];
+    }
 }
 @end
